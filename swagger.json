@@ -13,7 +13,7 @@
         "description": "Holdings data retrival service"
     }],
     "paths": {
-        "/v0.1/checkincards": {
+        "/v0.1/holdings/check-in-cards": {
             "get": {
                 "tags": ["holdings"],
                 "summary": "Retrieve check-in card and boxes associated with a holding",

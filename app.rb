@@ -37,7 +37,7 @@ def handle_event(event:, context:)
 
     if path == '/docs/checkincards'
         load_swagger_docs
-    elsif /\S+\/checkincards/.match? path
+    elsif /\S+\/holdings\/check\-in\-cards/.match? path
         fetch_records_and_respond params
     else
         create_response(404, "#{path} not found")

@@ -86,7 +86,7 @@ describe 'handler' do
 
             res = handle_event(
                 event: {
-                    'path' => '/api/v0.1/checkincards',
+                    'path' => '/api/v0.1/holdings/check-in-cards',
                     'httpMethod' => 'GET',
                     'queryStringParameters' => 'params'
                 },
