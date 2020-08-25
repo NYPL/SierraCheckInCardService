@@ -1,0 +1,179 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "v0.0.1",
+        "title": "Sierra Check-In Card Service",
+        "description": "Service for retrieving check-in cards and boxes associated with holding records"
+    },
+    "host": "platform.nypl.org",
+    "basePath": "/api",
+    "schemes": ["http", "https"],
+    "tags": [{
+        "name": "holdings",
+        "description": "Holdings data retrival service"
+    }],
+    "paths": {
+        "/v0.1/checkincards": {
+            "get": {
+                "tags": ["holdings"],
+                "summary": "Retrieve check-in card and boxes associated with a holding",
+                "description": "Returns the check-in boxes associated with a holding_id",
+                "parameters": [{
+                    "name": "holding_id",
+                    "in": "query",
+                    "description": "Sierra holdings record identifier",
+                    "required": true,
+                    "type": "integer"
+                }],
+                "repsonses": {
+                    "200": {
+                        "description": "An array of check-in boxes associated with the holdings id",
+                        "schema": {
+                            "$ref": "#/definitions/ResultResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Resource not found/invalid path",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid parameter received in Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "501": {
+                        "description": "Invalid Method (Only GET requests valid)",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "ResultResponse": {
+            "type": "object",
+            "properties": {
+                "statusCode": {
+                    "type": "integer",
+                    "format": "int32",
+                    "example": "200"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/CheckInBox"
+                    }
+                }
+            }
+        },
+        "CheckInBox": {
+            "type": "object",
+            "properties": {
+                "box_id": {
+                    "type": "integer"
+                },
+                "holding_id": {
+                    "type": "integer"
+                },
+                "box_count": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "enumeration": {
+                    "$ref": "#/definitions/Enumeration"
+               },
+               "start_date": {
+                   "type": "string",
+                   "format": "date"
+               },
+               "end_date": {
+                   "type": "string",
+                   "format": "date"
+               },
+               "trans_start_date": {
+                   "type": "string",
+                   "format": "date"
+               },
+               "trans_end_date": {
+                   "type": "string",
+                   "format": "date"
+               },
+               "status": {
+                   "$ref": "#/definitions/Status"
+               },
+               "claim_count": {
+                   "type": "integer",
+                   "format": "int32"
+               },
+               "copy_count": {
+                   "type": "integer",
+                   "format": "int32"
+               },
+               "url": {
+                   "type": "string"
+               },
+               "suppressed": {
+                   "type": "boolean"
+               },
+               "note": {
+                   "type": "string"
+               },
+               "staff_note": {
+                   "type": "string"
+               }
+            }
+        },
+        "Enumeration": {
+            "type": "object",
+            "properties": {
+                "enumeration": {
+                    "type": "string"
+                },
+                "levels": {
+                    "type": "array",
+                    "items": ["string"]
+                }
+            }
+        },
+        "Status": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                }
+            }
+        },
+        "ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "statusCode": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "data": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

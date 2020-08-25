@@ -1,0 +1,24 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Function for returning matching check-in card data for holdings
+
+Globals:
+    Function:
+      Timeout: 15
+      Runtime: ruby2.7
+      Handler: app.handle_event
+      Layers:
+        - arn:aws:lambda:us-east-1:224280085904:layer:ruby-pg-sqlite-lambda:2
+      Environment:
+        Variables:
+          LOG_LEVEL: debug
+          AWS_REGION: us-east-1
+
+Resources:
+  SierraCheckInCardPoller-dev:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+            SQLITE_FILE: 'checkInCards.sql'
+            SQLITE_BUCKET: 'check-in-card-data'
