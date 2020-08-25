@@ -1,0 +1,43 @@
+language: ruby
+rvm:
+- 2.7
+before_install:
+- gem update --system
+- gem install bundler
+- pip install awscli
+install:
+- rake run_bundler
+script:
+- rake lint
+- rake test
+before_deploy:
+- rm -rf vendor
+- bundle install --without test
+deploy:
+- provider: lambda
+  function_name: SierraCheckInCardService-qa
+  description: API service for returning check-in cards/boxes for associated holdings
+  region: us-east-1
+  role: arn:aws:iam::946183545209:role/lambda-full-access
+  runtime: ruby2.7
+  timeout: 15
+  memory_size: 128
+  module_name: app
+  handler_name: handle_event
+  layers:
+  - arn:aws:lambda:us-east-1:946183545209:layer:ruby-pg-sqlite-lambda:2
+  environment:
+  - LOG_LEVEL=debug
+  - SQLITE_FILE=checkInCards.sql
+  - SQLITE_BUCKET=check-in-card-data-qa
+  skip_cleanup: true
+  access_key_id: "$AWS_ACCESS_KEY_ID_QA"
+  secret_access_key: "$AWS_SECRET_ACCESS_KEY_QA"
+  on:
+    branch: qa
+after_deploy:
+- rake set_current_env_vars
+env:
+  global:
+  - secure: YFyV8zwUbShoKwJ+hhN/phoPORyu1CRNAGe4xqVJu/jp4465D8ZLc5etfdxtxm0RLMmPpc2ur4pisB8wLIYh0IEy+cLPPsWkJaza8mE1IMeMrsNB+Vsrz149cQ6gYo9IOkmbh2NxzKdQ9kRv7M9gWOTbd5Kgz2ASc5Qo39pXO0IrA/PQys+KKULsSkgoQzHP1fEy7yZOLu28Hz/AwhfL83asWOkgkv2g5kRCzO2lg/Yjx+SFiw7RmSoQBKMjaZ7G8nlhuFGxJ+yMKzHgllbKjzMUy4u2x7YEKr9FVRLTl8AH64b4+bClTr+pDzHhoKAdWbwUbIuQDKHT0bMni3qN7afIcXf1J9kHDzpSc0sbJkX1fdhOMmALUX3l5eDAetwfO7NSyB3Gkna0wENV0GgpyQZUC5iw808UtFUOPDlcFTkmyfnzjiCnUQtOqcqaTNTzAMm1wih9oVSAVKKuXIcFlcjRGf/UUzQgVy8ynh65T/H9a2fqxKNAy5Qlv16h+qRCtj4+11nlYPDCRP3kZAtDG4rk18ns2U4V81e37xZsJZJfEg99GE8gNSuGhD5yld8Doxzn3hVRb34/brVyZ1Y6/dujxcntAd2QoY8BqNLmbCHfrPbA14ZK4kFcB3DFMqKvoWiNrwe7JLhiPG/VOARxh9r2f15Sdh5HM+LZZ0UaPhU=
+  - secure: YaSQwc9qeZd1v78QP16q4CPEt+VNIaZVzbvcQ20r4vuO28/Gu7vzVJt/STEHHYnmZml91PRlVp9S0V0epZ3lxYZmlrNLQ6QI0fU433Q5q1Yu1aCnd3iB9mkHADdAluvrYKLrdak2X6cARtMGX70qhgf4AA1Ihj14BD5uHWgBo9SE+RYERhUUWLBMXnqzsxFdpfehKt8GIUwc5pyDwjtW+HKlq6z44OMK4RzQQqQqLjrcD8nKmmJrZ9MrjMFw6jMvjTID+ShpuQY6TeBRwOPTDkTYmOoRU+XN44t+JUEd+4vjFjqhP8ICPs+bsJgmKxmex2tqdvEc89JUu7bQUUVtJrtvyZInEJ1aWTT6u8YKAWom5EXI8ZBq0dBXYGlPojidJJ5u5giBLpzMAn5kio8qoa+WfSaslpZkh5JqDPKlnLTZdYc26omvI8+NFF4hqdgnwUwwTe1AI9o1dxRbOSAlm8lgoo9hGn4qcRjffxe8N6fFEM9ZUfNkB/usrWHZZheErzlrjoY29DDdRNe4uZccC8f33+it1jzybUrPWmWv+PuQy5hwejfV32YAiWKqNBu+mbVHzyQ1YJ2b2iwiF6RPCfuaZ2usWeCwkF8NMMyg3UNr4eGHDe2u/oYgP7EeRpHMhuuaVBsGyKibCtzLO3lO3QVv8hNSvtXrLgdBohkM1Y0=
