@@ -57,7 +57,12 @@ end
 def create_response(status_code = 200, body = nil)
     $logger.info "Responding with #{status_code}"
 
-    { statusCode: status_code, data: body }
+    {
+        statusCode: status_code,
+        data: JSON.dump(body),
+        isBase64Encoded: false,
+        headers: { 'Content-type': 'application/json' }
+    }
 end
 
 def load_swagger_docs
