@@ -126,7 +126,7 @@ describe 'handler' do
             test_hash = create_response(200, 'test_body')
 
             expect(test_hash[:statusCode]).to eq(200)
-            expect(test_hash[:data]).to eq(JSON.dump('test_body'))
+            expect(test_hash[:body]).to eq(JSON.dump('test_body'))
         end
     end
 
