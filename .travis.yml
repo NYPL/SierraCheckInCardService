@@ -21,23 +21,53 @@ deploy:
   role: arn:aws:iam::946183545209:role/lambda-full-access
   runtime: ruby2.7
   timeout: 15
-  memory_size: 128
+  memory_size: 512
   module_name: app
   handler_name: handle_event
   layers:
   - arn:aws:lambda:us-east-1:946183545209:layer:ruby-pg-sqlite-lambda:2
   environment:
-  - LOG_LEVEL=debug
-  - SQLITE_FILE=checkInCards.sql
-  - SQLITE_BUCKET=check-in-card-data-qa
+    variables:
+      LOG_LEVEL: debug
+      SQLITE_FILE: checkInCards.sql
+      SQLITE_BUCKET: check-in-card-data-qa
   skip_cleanup: true
   access_key_id: "$AWS_ACCESS_KEY_ID_QA"
   secret_access_key: "$AWS_SECRET_ACCESS_KEY_QA"
   on:
     branch: qa
+- provider: lambda
+  function_name: SierraCheckInCardService-production
+  description: API service for returning check-in cards/boxes for associated holdings
+  region: us-east-1
+  role: arn:aws:iam::946183545209:role/lambda-full-access
+  runtime: ruby2.7
+  timeout: 15
+  memory_size: 512
+  module_name: app
+  handler_name: handle_event
+  layers:
+  - arn:aws:lambda:us-east-1:946183545209:layer:ruby-pg-sqlite-lambda:2
+  vpc:
+    subnet_ids:
+    - subnet-59bcdd03
+    - subnet-5deecd15
+    security_group_ids:
+    - sg-116eeb60
+  environment:
+    variables:
+      LOG_LEVEL: debug
+      SQLITE_FILE: checkInCards.sql
+      SQLITE_BUCKET: check-in-card-data-production
+  skip_cleanup: true
+  access_key_id: "$AWS_ACCESS_KEY_ID_PRODUCTION"
+  secret_access_key: "$AWS_SECRET_ACCESS_KEY_PRODUCTION"
+  on:
+    branch: production
 after_deploy:
-- rake set_current_env_vars
+- rake set_config
 env:
   global:
-  - secure: YFyV8zwUbShoKwJ+hhN/phoPORyu1CRNAGe4xqVJu/jp4465D8ZLc5etfdxtxm0RLMmPpc2ur4pisB8wLIYh0IEy+cLPPsWkJaza8mE1IMeMrsNB+Vsrz149cQ6gYo9IOkmbh2NxzKdQ9kRv7M9gWOTbd5Kgz2ASc5Qo39pXO0IrA/PQys+KKULsSkgoQzHP1fEy7yZOLu28Hz/AwhfL83asWOkgkv2g5kRCzO2lg/Yjx+SFiw7RmSoQBKMjaZ7G8nlhuFGxJ+yMKzHgllbKjzMUy4u2x7YEKr9FVRLTl8AH64b4+bClTr+pDzHhoKAdWbwUbIuQDKHT0bMni3qN7afIcXf1J9kHDzpSc0sbJkX1fdhOMmALUX3l5eDAetwfO7NSyB3Gkna0wENV0GgpyQZUC5iw808UtFUOPDlcFTkmyfnzjiCnUQtOqcqaTNTzAMm1wih9oVSAVKKuXIcFlcjRGf/UUzQgVy8ynh65T/H9a2fqxKNAy5Qlv16h+qRCtj4+11nlYPDCRP3kZAtDG4rk18ns2U4V81e37xZsJZJfEg99GE8gNSuGhD5yld8Doxzn3hVRb34/brVyZ1Y6/dujxcntAd2QoY8BqNLmbCHfrPbA14ZK4kFcB3DFMqKvoWiNrwe7JLhiPG/VOARxh9r2f15Sdh5HM+LZZ0UaPhU=
-  - secure: YaSQwc9qeZd1v78QP16q4CPEt+VNIaZVzbvcQ20r4vuO28/Gu7vzVJt/STEHHYnmZml91PRlVp9S0V0epZ3lxYZmlrNLQ6QI0fU433Q5q1Yu1aCnd3iB9mkHADdAluvrYKLrdak2X6cARtMGX70qhgf4AA1Ihj14BD5uHWgBo9SE+RYERhUUWLBMXnqzsxFdpfehKt8GIUwc5pyDwjtW+HKlq6z44OMK4RzQQqQqLjrcD8nKmmJrZ9MrjMFw6jMvjTID+ShpuQY6TeBRwOPTDkTYmOoRU+XN44t+JUEd+4vjFjqhP8ICPs+bsJgmKxmex2tqdvEc89JUu7bQUUVtJrtvyZInEJ1aWTT6u8YKAWom5EXI8ZBq0dBXYGlPojidJJ5u5giBLpzMAn5kio8qoa+WfSaslpZkh5JqDPKlnLTZdYc26omvI8+NFF4hqdgnwUwwTe1AI9o1dxRbOSAlm8lgoo9hGn4qcRjffxe8N6fFEM9ZUfNkB/usrWHZZheErzlrjoY29DDdRNe4uZccC8f33+it1jzybUrPWmWv+PuQy5hwejfV32YAiWKqNBu+mbVHzyQ1YJ2b2iwiF6RPCfuaZ2usWeCwkF8NMMyg3UNr4eGHDe2u/oYgP7EeRpHMhuuaVBsGyKibCtzLO3lO3QVv8hNSvtXrLgdBohkM1Y0=
+  - secure: mvkAvo1cMLYQ8cFc/Jm7EBYOQ2kXGJnc/8D9PmHsQuktZcvzGSZe8yM9RCkzakyXQyf8XYmlT73/SwLx/l8g4X0Bg+9YfNSxkyl0mMfPXCbfe86/LQim+ZEiCaXn40PVtv+rOqeh9Ux2YJgLRRrE3mp7sTEcqKEp3mMlgMExSr0Wurlxwp5enEy2e9beO4n2QLzDsVL1yTEavdYgko/9eelc0jd+ShH2O9XUra/Uhkq3QoOWHTrp44AUzH8YTo637Ta75h4QNmMjoMqZH3bw6I+nUR8yTy8gOJEI2wKg2Uv9HriPYeW77WZQhLN0v/4Yo/r8LOjwbCWTCxs1WDMF/sfIPMSv+/gIYTk3/jkLrg7+ikgBfzYleoKF4dyax7fNgRA9Kure3hTXnnVBaeSqLu8x8v9eDRj9Q2VLb2maia0Fooa3zwOfbH9m3setKqRt7ksurzyQ3F7UXKRq6VmHrDQnLiDRzdjxjjq0ML2eDR4k9WQt9cl+EaCMEUtWelQtOjYIcSAFIUI3A6LMqop3om0e/ibl5YNdr3m4uibF9CQjBQb+BzkUZsrJA65ZtGlPIcIQSgI2J3dJWl+h4vhVSX8pvEqt0KkRSlw3J4wYtxbxMgt9Amx8uAFfwuMlvZBS3Jf7VQNh2MLqR8PdbEgzJVxUKG3T3CnW4ltrCuxwnCw=
+  - secure: jYBtN1M3AATumSeq+FKbAsYetV2RclyK/itSUc9oMpgpJwnyWcxi+kPZhlbyqQjdHWTBPL6xVnxPtBDR6w2Rf0JwCBBBpNnJpBoEaTrgBWKU2BwjEc0Og+yxoXyOVKsG7R3uuQHjKZuHcnTTYYctzroPpTng5JxHLZ+nOw52UY8RK3Xv/539MNh+UxiEk8mn6af2fdhOeD0EFWA4BrfOh99YXdPdZBVq/jOkDnvIGS8leHR7AbB126gKoWyVG51Q/vZ8eX0oojGGxMw200kdljzEUCKIB0b2djVHhVjy0a4Plh34wfE/dokJ3C96u/CQnn22LxDC8wJl5aTjGQpY+hcNMomW7YzcwSN1+QPg1MszLMXGtfcJ3s6jDcIoyZunosY+TYZo5Wp8vLjNJharI0Wlt+y33A8uiMuG785VAjsHS8M8pKeyQIUrCkuSYjUpyR1D9iumtJwYgrAbA997paoPUO9l0f1wBBnexWmyFbZhVkQR2bA5gaL5AnuevhLEP21s3q6yNUYrmSrMW+q7/x5xtAr7jc446I/dxoCqZ6K//XNGQKdWRFEwu7Vb++hr3TlW2bUoOGk8qzKCpv20JguGHNAfNzpnWjCq/PHJnWshwGFG8FdxVEtztiow5taZN2GFvouXtGfyqWCJXk7uP/Gd8BE1hH5s//51Wr6sMps=
+  - secure: YGm0GNfhRuOJuE1g7SxMQeqGYtWmf5gJCdtneNKBWkX+HRD4ViY9IuJy45t1guOYPromDO520EDi34dRF0u/PEjmP15UaDBjpqM1hO4H93C2yIpV6lpUeiGHRYHPTlVSs+iCaijGGpsyUGYgZH0ebXWGPTMHY4Oayf7MujOmWqJC8ydql7WEIyPS7QBnDTOWnjwvmqDrVNHwB/TyzOn+ktK4gIaA/PIxdt59jXQ61NzyfrZg9sF0ParXKWyykBNqrwgTbngQPRr3vx1PT8ZVfXfFXbb9Oo1gpQhqqNrNUIFY+V6JiONtIx6JCuxGcUs6/fmwual9/8F6zws5O7o9zP+WptGNacN3iVafbjjeQ8BbwSq1XBR7vPp2mRhuu+7q/Ak96ovx0OvFhK8er/xyJvtcwfUWiGmRC0pJSJnqIqgzXPyKNqEmzy+RYQxMo7MwTfvPrcLmFLOm5tFxMRQkZWfD8Oi/EHr7auafT1V5Gc0qwmXpK1flSqTCI6cyJVeH7ig7qBPMvEGrmTO9sVi8klFE+r/yxaMwBa4CtEhdhWwlDYch753TGPb8dv1o8PPixwzzZUjKg8dFObyoVzkwgAcb3LSFvZ7CJzqpVVU2K1oMvJhJ6h3ls1uKDhEchADuysT8U9j14xDdFFKlEJfrPX1a0lQCxreEE1HWhsoX5d0=
