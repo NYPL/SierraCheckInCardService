@@ -190,6 +190,9 @@ Style/TrailingCommaInArrayLiteral:
 Style/TrailingCommaInHashLiteral:
   Enabled: False
 
+Style/UnlessElse:
+  Enabled: False
+
 # This one is too restrictive. E.g., 
 #     [['Mozart, Wolfgang Amadeus,', "a"], ["1756-1791", "d"]]
 #   reads better (and is easier to maintain, e.g., when making small changes) than

@@ -1,5 +1,4 @@
 require 'yaml'
-require_relative 'rake_helper'
 # Basic utility commands to make working with SAM and AWS Lambda more friendly
 
 desc 'Run test suite'
@@ -22,9 +21,10 @@ task :lint do
     sh %( rubocop )
 end
 
-desc "Update lambda layers, environment_variables, vpc, and events"
+desc 'Update lambda layers, environment_variables, vpc, and events'
 task :set_config do
-  rake_helper = RakeHelper.new
-  rake_helper.update_lambda_configuration
-  rake_helper.update_event
+    require_relative 'rake_helper'
+    rake_helper = RakeHelper.new
+    rake_helper.update_lambda_configuration
+    rake_helper.update_event
 end
