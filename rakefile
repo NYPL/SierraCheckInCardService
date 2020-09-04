@@ -1,4 +1,5 @@
 require 'yaml'
+require_relative 'rake_helper'
 # Basic utility commands to make working with SAM and AWS Lambda more friendly
 
 desc 'Run test suite'
@@ -16,25 +17,14 @@ task :run_bundler do
     sh %( bundle config unset deployment; bundle install; bundle config set deployment 'true'; bundle install )
 end
 
-desc 'Run AWS environment config to set environment variables'
-task :set_current_env_vars do
-    if ENV['AWS_ACCESS_KEY_ID_QA'] && ENV['AWS_SECRET_ACCESS_KEY_QA']
-        sh %( aws configure set aws_access_key_id #{ENV['AWS_ACCESS_KEY_ID_QA']} )
-        sh %( aws configure set aws_secret_access_key #{ENV['AWS_SECRET_ACCESS_KEY_QA']} )
-    end
-
-    travis_conf = YAML.safe_load(File.read('.travis.yml'))
-    travis_conf['deploy'].each do |dep|
-        next if dep[true]['branch'] != ENV['TRAVIS_BRANCH']
-
-        env_var_str = "Variables={#{dep['environment'].join(', ')}}"
-        # rubocop:disable Layout/LineLength
-        sh %( aws lambda update-function-configuration --function-name #{dep['function_name']} --environment "#{env_var_str}" --region us-east-1 )
-        # rubocop:enable Layout/LineLength
-    end
-end
-
 desc 'Lint the application with the local rubocop settings'
 task :lint do
     sh %( rubocop )
+end
+
+desc "Update lambda layers, environment_variables, vpc, and events"
+task :set_config do
+  rake_helper = RakeHelper.new
+  rake_helper.update_lambda_configuration
+  rake_helper.update_event
 end
