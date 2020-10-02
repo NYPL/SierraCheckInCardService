@@ -101,5 +101,13 @@ describe DateComponent do
 
             expect(out_date).to eq('2020---01')
         end
+
+        it 'should return an ISO-8601 year if day and month are missing' do
+            @test_date.instance_variable_set(:@start_year, '2020')
+
+            out_date = @test_date.send(:_format_str, 'start')
+
+            expect(out_date).to eq('2020')
+        end
     end
 end

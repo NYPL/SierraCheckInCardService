@@ -39,6 +39,6 @@ class DateComponent
         month = instance_variable_get("@#{pos}_month") || '-'
         day = instance_variable_get("@#{pos}_day")
 
-        "#{year}-#{month}-#{day}".chomp('-')
+        "#{year}-#{month}-#{day}".gsub(/\-+$/, '')
     end
 end
