@@ -1,5 +1,7 @@
 # SierraCheckInCardService
 
+[![Build Status](https://travis-ci.com/NYPL/SierraCheckInCardService.svg?branch=main)](https://travis-ci.com/NYPL/SierraCheckInCardService) [![GitHub version](https://badge.fury.io/gh/nypl%2FsierraCheckInCardService.svg)](https://badge.fury.io/gh/nypl%2FsierraCheckInCardService)
+
 Function that returns the matching check-in card (and associated boxes) for a given holdings record identifier. This provides information on the most recent issues/copies received for a serial, which may or may not be represented in the holding record. This retrieves the data from the database created by [SierraCheckInCardPoller](https://github.com/NYPL/SierraCheckInCardPoller)
 
 ## Data Structure
