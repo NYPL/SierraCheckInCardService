@@ -43,14 +43,15 @@ describe SQLITEClient do
     end
 
     describe :parse_rows do
+        let(:mock_struct) { Struct.new(:id) }
+
         it 'should invoke RowTransformer for each row and return a hash' do
             mock_row = mock
-            MockStruct = Struct.new(:id)
             RowTransformer.stubs(:new).once.with(1).returns(mock_row)
             RowTransformer.stubs(:new).once.with(2).returns(mock_row)
             RowTransformer.stubs(:new).once.with(3).returns(mock_row)
             mock_row.stubs(:transform).times(3)
-            mock_row.stubs(:formatted_row).times(3).returns(MockStruct.new(1))
+            mock_row.stubs(:formatted_row).times(3).returns(mock_struct.new(1))
 
             out_arr = @test_client.parse_rows([1, 2, 3])
 
