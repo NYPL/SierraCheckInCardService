@@ -1,44 +1,85 @@
+require 'date'
+
 # Component that parses date components from different fields into combined date range representations
 class DateComponent
-    attr_reader :date_str
+    attr_reader :date_strs
 
-    def initialize
-        @start_year = nil
-        @end_year = nil
-        @start_month = nil
-        @end_month = nil
-        @start_day = nil
-        @end_day = nil
+    # These are ISO-8601 season codes that are used in catalog records
+    @@season_codes = {
+        21 => 'Spring',
+        22 => 'Summer',
+        23 => 'Fall',
+        24 => 'Winter'
+    }
 
-        @date_str = ''
-    end
-
-    def set_field(component, value)
-        return if /^0\-?$/.match value
-
-        value_arr = value.split('-')
-        instance_variable_set("@start_#{component}", value_arr[0])
-        instance_variable_set("@end_#{component}", value_arr[1] || value_arr[0])
+    def initialize(date_values)
+        @date_values = date_values
+        @date_strs = {
+            start: nil,
+            end: nil
+        }
     end
 
     def create_strs
-        start_str = _format_str 'start'
-        end_str = _format_str 'end'
+        $logger.debug 'Parsing date strings from values', { values: @date_values }
+        # Split date strings into start/end values and then pivot them into properly arranged arrays
+        # e.g. [[1, 2], [3, 4], [5, 6]] to [[1, 3, 5], [2, 4, 6]]
+        date_components = @date_values.map { |v| _extract_date_components v }.transpose
 
-        if start_str == end_str
-            { start: start_str, end: nil }
-        else
-            { start: start_str, end: end_str }
+        begin
+            start_str = _transform_date_components_to_str date_components[0]
+            end_str = _transform_date_components_to_str date_components[1]
+            $logger.info "Setting date values: start / #{start_str}, end / #{end_str}"
+
+            @date_strs[:start] = start_str
+            @date_strs[:end] = end_str && end_str != start_str ? end_str : nil
+        rescue Date::Error, TypeError
+            $logger.error 'Unable to parse date values for this check-in box'
+            $logger.debug date_components
         end
     end
 
     private
 
-    def _format_str(pos)
-        year = instance_variable_get("@#{pos}_year")
-        month = instance_variable_get("@#{pos}_month") || '-'
-        day = instance_variable_get("@#{pos}_day")
-
-        "#{year}-#{month}-#{day}".gsub(/\-+$/, '')
+    def _extract_date_components(component)
+        component_arr = component.split('-')
+        component_arr[1] ? component_arr : [component_arr[0], component_arr[0]]
     end
+
+    # rubocop:disable Metrics/CyclomaticComplexity
+    def _transform_date_components_to_str(part)
+        $logger.debug 'Creating date string from', { values: part }
+        date_str = nil
+
+        # Create a simplified array with the shape of the date values
+        # This gives us a good idea of what the date format is
+        null_positions = part.map { |x| x.nil? ? 0 : 1 }
+
+        # Convert to array of ints with no nil values since DateTime doesn't like them
+        date_array = part.map { |x| x.nil? ? x : x.to_i }
+
+        case null_positions
+        # Single value should be a year and returned as-is
+        when [1, 0, 0]
+            date_str = date_array[0].to_s
+        # Two consecutive values should be Month-Year or Season-Year
+        when [1, 1, 0]
+            begin
+                date_str = DateTime.new(*date_array.compact).strftime('%b. %Y')
+            rescue Date::Error => e
+                $logger.error 'Unable to parse date', { value: date_array, reason: e }
+                # DateTime doesn't know about seasons, so fake it here
+                date_str = "#{@@season_codes[date_array[1]]} #{date_array[0]}"
+            end
+        # Three values will 99.99% of the time be a true date
+        when [1, 1, 1]
+            date_str = DateTime.new(*date_array).strftime('%b. %-d, %Y')
+        # A missing value in the month/season position might indicate a day-of-year value
+        when [1, 0, 1]
+            date_str = "Day #{date_array[2]} of #{date_array[0]}"
+        end
+
+        date_str
+    end
+    # rubocop:enable Metrics/CyclomaticComplexity
 end
