@@ -69,15 +69,15 @@ class DateComponent
     # rubocop:disable Metrics/CyclomaticComplexity
     def _transform_date_components_to_str(part)
         $logger.debug 'Creating date string from', { values: part }
-        date_values = part[0,3] # We only want the first three values, so slice to be safe
+        date_values = part[0, 3] # We only want the first three values, so slice to be safe
         date_str = nil
 
         # Create a simplified array with the shape of the date values
         # This gives us a good idea of what the date format is
-        null_positions = part.map { |x| x.nil? ? 0 : 1 }
+        null_positions = date_values.map { |x| x.nil? ? 0 : 1 }
 
         # Convert to array of ints with no nil values since DateTime doesn't like them
-        date_array = part.map { |x| x.nil? ? x : x.to_i }
+        date_array = date_values.map { |x| x.nil? ? x : x.to_i }
 
         case null_positions
         # Single value should be a year and returned as-is
@@ -99,9 +99,9 @@ class DateComponent
         when [1, 0, 1]
             date_str = "Day #{date_array[2]} of #{date_array[0]}"
         else
-            $logger.error "Unable to process date components, unrecognized format", { components: part }
-            $logger.debug "Shape of components: ", { date_comp_shape: null_positions }
-            raise DateComponentError, "Unprocessable component found"
+            $logger.error 'Unable to process date components, unrecognized format', { components: part }
+            $logger.debug 'Shape of components: ', { date_comp_shape: null_positions }
+            raise DateComponentError, 'Unprocessable component found'
         end
 
         date_str
