@@ -19,7 +19,7 @@ describe DateComponent do
         end
 
         it 'should return a hash containing start and end dates if they are different' do
-            @test_date.instance_variable_set(:@date_values, ['2020', '01-12', '1-31'])
+            @test_date.instance_variable_set(:@date_values, [2020, '01-12', '1-31'])
 
             @test_date.create_strs
 
