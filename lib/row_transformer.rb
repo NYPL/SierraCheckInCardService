@@ -1,4 +1,5 @@
 require_relative './date_component'
+require_relative './enumeration_component'
 
 # Transforms a row of sql data representing a check-in box into a simplified JSON representation
 class RowTransformer
@@ -73,10 +74,11 @@ class RowTransformer
     end
 
     def load_enumeration_field
-        enum_fields = @transformed_row.filter { |k, _| k.include? 'enum_level_' }.values
+        enum_component = EnumerationComponent.new(@transformed_row.filter { |k, _| k.include? 'enum_level_' }.values)
+        enum_component.generate_enumeration
         @formatted_row.enumeration = {
-            enumeration: enum_fields.filter { |f| !f.nil? }.join(':'),
-            levels: enum_fields
+            enumeration: enum_component.enum_string,
+            levels: enum_component.enum_values
         }
     end
 
@@ -91,13 +93,9 @@ class RowTransformer
     end
 
     def parse_date_fields(regex)
-        date_component = DateComponent.new
-        @transformed_row.filter { |k, v| regex.match?(k) && !v.nil? }.each do |k, v|
-            date_field = regex.match(k)[1]
-            date_component.set_field(@@chron_fields[date_field], v.to_s)
-        end
-
+        date_component = DateComponent.new(@transformed_row.filter { |k, _| regex.match?(k) }.values)
         date_component.create_strs
+        date_component
     end
 end
 
