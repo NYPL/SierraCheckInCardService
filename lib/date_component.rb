@@ -35,7 +35,7 @@ class DateComponent
         $logger.debug 'Parsing date strings from values', { values: @date_values }
         # Split date strings into start/end values and then pivot them into properly arranged arrays
         # e.g. [[1, 2], [3, 4], [5, 6]] to [[1, 3, 5], [2, 4, 6]]
-        date_components = @date_values.map { |v| _extract_date_components v }.transpose
+        date_components = @date_values.map { |v| _extract_date_components v.to_s }.transpose
 
         begin
             start_str = _transform_date_components_to_str date_components[0]
