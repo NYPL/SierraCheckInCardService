@@ -41,6 +41,11 @@ class DateComponent
 
     private
 
+    # This takes individual date components and turns them into start/end arrays
+    # Components are strings and can be either single values ("2020") or spans ("2019-2020")
+    # This returns an array of either both values, or the single value duplicated
+    # This supports date ranges within a single year or month (e.g. three values of
+    # "2020", "01-03" and "01-15" would eventually become "2020-01-01" and "2020-03-15")
     def _extract_date_components(component)
         component_arr = component.split('-')
         component_arr[1] ? component_arr : [component_arr[0], component_arr[0]]
