@@ -84,12 +84,12 @@ class RowTransformer
 
     def load_date_fields
         chron_dates = parse_date_fields(/chron_level_([a-z]{1})$/)
-        @formatted_row.start_date = chron_dates[:start]
-        @formatted_row.end_date = chron_dates[:end]
+        @formatted_row.start_date = chron_dates.date_strs[:start]
+        @formatted_row.end_date = chron_dates.date_strs[:end]
 
         trans_dates = parse_date_fields(/chron_level_([a-z]{1})_trans_date$/)
-        @formatted_row.trans_start_date = trans_dates[:start]
-        @formatted_row.trans_end_date = trans_dates[:end]
+        @formatted_row.trans_start_date = trans_dates.date_strs[:start]
+        @formatted_row.trans_end_date = trans_dates.date_strs[:end]
     end
 
     def parse_date_fields(regex)

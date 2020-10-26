@@ -128,10 +128,15 @@ describe RowTransformer do
 
     describe :load_date_fields do
         it 'should set dates for both coverage and transaction fields' do
+            chron_mock = mock
+            chron_mock.stubs(:date_strs).returns({ start: 'start', end: 'end' })
             @test_row.stubs(:parse_date_fields).once\
-                .with(/chron_level_([a-z]{1})$/).returns({ start: 'start', end: 'end' })
+                .with(/chron_level_([a-z]{1})$/).returns(chron_mock)
+
+            trans_mock = mock
+            trans_mock.stubs(:date_strs).returns({ start: 'trans_start', end: 'trans_end' })
             @test_row.stubs(:parse_date_fields).once\
-                .with(/chron_level_([a-z]{1})_trans_date$/).returns({ start: 'trans_start', end: 'trans_end' })
+                .with(/chron_level_([a-z]{1})_trans_date$/).returns(trans_mock)
 
             @test_row.load_date_fields
 
