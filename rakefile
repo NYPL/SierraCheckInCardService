@@ -1,6 +1,7 @@
 require 'yaml'
-# Basic utility commands to make working with SAM and AWS Lambda more friendly
+require 'nypl_ruby_util'
 
+# Basic utility commands to make working with SAM and AWS Lambda more friendly
 desc 'Run test suite'
 task :test do
     sh %( rspec -fd )
@@ -23,8 +24,7 @@ end
 
 desc 'Update lambda layers, environment_variables, vpc, and events'
 task :set_config do
-    require_relative 'rake_helper'
-    rake_helper = RakeHelper.new
+    rake_helper = NyplRubyUtil::DeployHelper.new
     rake_helper.update_lambda_configuration
     rake_helper.update_event
 end
