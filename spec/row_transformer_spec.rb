@@ -113,6 +113,12 @@ describe RowTransformer do
                 'enum_level_d' => 4, 'enum_level_e' => nil
             })
 
+            enum_mock = mock
+            EnumerationComponent.stubs(:new).once.with([1, 2, nil, 4, nil]).returns(enum_mock)
+            enum_mock.stubs(:generate_enumeration).once
+            enum_mock.stubs(:enum_string).once.returns('1:2:4')
+            enum_mock.stubs(:enum_values).once.returns([1, 2, nil, 4, nil])
+
             @test_row.load_enumeration_field
 
             expect(@test_row.instance_variable_get(:@formatted_row).enumeration[:enumeration]).to eq('1:2:4')
@@ -122,10 +128,15 @@ describe RowTransformer do
 
     describe :load_date_fields do
         it 'should set dates for both coverage and transaction fields' do
+            chron_mock = mock
+            chron_mock.stubs(:date_strs).returns({ start: 'start', end: 'end' })
             @test_row.stubs(:parse_date_fields).once\
-                .with(/chron_level_([a-z]{1})$/).returns({ start: 'start', end: 'end' })
+                .with(/chron_level_([a-z]{1})$/).returns(chron_mock)
+
+            trans_mock = mock
+            trans_mock.stubs(:date_strs).returns({ start: 'trans_start', end: 'trans_end' })
             @test_row.stubs(:parse_date_fields).once\
-                .with(/chron_level_([a-z]{1})_trans_date$/).returns({ start: 'trans_start', end: 'trans_end' })
+                .with(/chron_level_([a-z]{1})_trans_date$/).returns(trans_mock)
 
             @test_row.load_date_fields
 
@@ -139,20 +150,16 @@ describe RowTransformer do
     describe :parse_date_fields do
         it 'should return formatted strings from provided components' do
             @test_row.instance_variable_set(:@transformed_row, {
-                'chron_level_i' => '2020', 'chron_level_j' => '01', 'chron_level_k' => '01', 'chron_level_l' => nil
+                'chron_level_i' => '2020', 'chron_level_j' => '01', 'chron_level_k' => '01'
             })
 
             date_mock = mock
-            DateComponent.stubs(:new).once.returns(date_mock)
-            date_mock.stubs(:set_field).once.with('year', '2020')
-            date_mock.stubs(:set_field).once.with('month', '01')
-            date_mock.stubs(:set_field).once.with('day', '01')
+            DateComponent.stubs(:new).once.with(['2020', '01', '01']).returns(date_mock)
+            date_mock.stubs(:create_strs).once
 
-            date_mock.stubs(:create_strs).once.returns('test_dates')
+            date_comp = @test_row.parse_date_fields(/chron_level_([a-z]{1})$/)
 
-            test_fields = @test_row.parse_date_fields(/chron_level_([a-z]{1})$/)
-
-            expect(test_fields).to eq('test_dates')
+            expect(date_comp).to eq(date_mock)
         end
     end
 end
