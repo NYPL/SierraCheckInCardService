@@ -62,7 +62,7 @@ describe 'handler' do
             stubs(:load_swagger_docs).once.returns(200)
 
             res = handle_event(
-                event: { 'path' => '/docs/checkincards', 'httpMethod' => 'GET', 'queryStringParameters' => 'params' },
+                event: { 'path' => '/docs/check-in-cards', 'httpMethod' => 'GET', 'queryStringParameters' => 'params' },
                 context: {}
             )
 
