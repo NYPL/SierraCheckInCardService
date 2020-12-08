@@ -35,7 +35,7 @@ def handle_event(event:, context:)
 
     return create_response(501, 'sierraCheckInCardService only implements GET endpoints') unless method == 'GET'
 
-    if path == '/docs/checkincards'
+    if path == '/docs/check-in-cards'
         load_swagger_docs
     elsif /\S+\/holdings\/check\-in\-cards/.match? path
         fetch_records_and_respond params
