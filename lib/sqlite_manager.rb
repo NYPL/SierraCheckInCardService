@@ -19,13 +19,11 @@ class SQLITEClient
     end
 
     def parse_rows(rows)
-        rows.map do |row|
+        rows.reject { |row| row['id'].nil? }.map do |row|
             box_row = RowTransformer.new row
             box_row.transform
 
             box_row.formatted_row.to_h
-        end.reject do |row|
-            row[:box_id].nil?
         end
     end
 end

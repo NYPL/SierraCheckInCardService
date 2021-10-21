@@ -28,7 +28,7 @@ describe SQLITEClient do
 
         it 'should invoke RowTransformer for each row and return a hash' do
             mock_row = mock
-            sample_rows = [{ id: 1 }, { id: 2 }, { id: 3 }]
+            sample_rows = [{ 'id' => 1 }, { 'id' => 2 }, { 'id' => 3 }]
             RowTransformer.stubs(:new).once.with(sample_rows[0]).returns(mock_row)
             RowTransformer.stubs(:new).once.with(sample_rows[1]).returns(mock_row)
             RowTransformer.stubs(:new).once.with(sample_rows[2]).returns(mock_row)
