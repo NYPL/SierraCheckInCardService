@@ -7,7 +7,9 @@ def init
     return if $initialized
 
     $logger = NYPLRubyUtil::NyplLogFormatter.new($stdout, level: ENV['LOG_LEVEL'])
-    $kms_client = ENV['PROFILE'] ? NYPLRubyUtil::KmsClient.new({ profile: ENV['PROFILE'] }) : NYPLRubyUtil::KmsClient.new
+    $kms_client = ENV['PROFILE'] ?
+      NYPLRubyUtil::KmsClient.new({ profile: ENV['PROFILE'] }) :
+      NYPLRubyUtil::KmsClient.new
 
     $sqlite_client = SQLITEClient.new
     $pg_client = PSQLClient.new

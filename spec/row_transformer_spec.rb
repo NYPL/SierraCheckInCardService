@@ -28,7 +28,14 @@ describe RowTransformer do
 
     describe :transform_row do
         it 'should store row as a hash' do
-            test_val = {'id' => 1, 'holding_record_id' => 2, 'record_num' => 3, 'box_count' => 120, 'enum_level_a' => 15, 'staff_note' => 'testing'}
+            test_val = {
+                'id' => 1,
+                'holding_record_id' => 2,
+                'record_num' => 3,
+                'box_count' => 120,
+                'enum_level_a' => 15,
+                'staff_note' => 'testing'
+            }
             @test_row.instance_variable_set(:@db_row, test_val)
 
             @test_row.transform_row

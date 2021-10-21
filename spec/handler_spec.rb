@@ -18,7 +18,6 @@ describe 'handler' do
         end
 
         it 'should invoke clients and logger from the ruby utils gem' do
-
             init
 
             expect($kms_client).to eq(@kms_mock)

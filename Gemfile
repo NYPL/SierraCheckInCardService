@@ -14,5 +14,4 @@ group :test do
     gem 'rspec'
     gem 'rubocop', require: false
     gem 'sqlite3'
-    gem 'pg'
 end

@@ -1,9 +1,7 @@
 require_relative './row_transformer'
 
+# Manages fetching and parsing records
 class SQLITEClient
-    def initialize
-    end
-
     def fetch_records(holding_id)
         rows = []
         offset = 0
@@ -27,7 +25,7 @@ class SQLITEClient
 
             box_row.formatted_row.to_h
         end.reject do |row|
-          row[:box_id].nil?
+            row[:box_id].nil?
         end
     end
 end
