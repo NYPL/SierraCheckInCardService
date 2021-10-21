@@ -1,23 +1,16 @@
 require 'nypl_ruby_util'
 
-require_relative 'lib/s3_manager'
 require_relative 'lib/sqlite_manager'
+require_relative 'lib/pg_manager'
 
 def init
     return if $initialized
 
     $logger = NYPLRubyUtil::NyplLogFormatter.new($stdout, level: ENV['LOG_LEVEL'])
-    $kms_client = NYPLRubyUtil::KmsClient.new
-    $s3_client = S3Client.new
-
-    begin
-        $s3_client.retrieve_data ENV['SQLITE_FILE']
-    rescue S3Error => e
-        $logger.info 'Received s3 error, unable to load sqlite file from s3', { message: e.message }
-        return create_response(500, 'unable to load necessary data from AWS S3')
-    end
+    $kms_client = ENV['PROFILE'] ? NYPLRubyUtil::KmsClient.new({ profile: ENV['PROFILE'] }) : NYPLRubyUtil::KmsClient.new
 
     $sqlite_client = SQLITEClient.new
+    $pg_client = PSQLClient.new
 
     $logger.debug 'Initialized function'
     $initialized = true

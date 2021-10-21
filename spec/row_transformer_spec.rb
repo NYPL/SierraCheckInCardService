@@ -27,14 +27,8 @@ describe RowTransformer do
     end
 
     describe :transform_row do
-        it 'should turn arrays of field keys and values into a hash' do
-            test_val = Array.new(30)
-            test_val[0] = 1
-            test_val[1] = 2
-            test_val[2] = 3
-            test_val[4] = 120
-            test_val[5] = 15
-            test_val[29] = 'testing'
+        it 'should store row as a hash' do
+            test_val = {'id' => 1, 'holding_record_id' => 2, 'record_num' => 3, 'box_count' => 120, 'enum_level_a' => 15, 'staff_note' => 'testing'}
             @test_row.instance_variable_set(:@db_row, test_val)
 
             @test_row.transform_row
