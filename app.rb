@@ -1,6 +1,6 @@
 require 'nypl_ruby_util'
 
-require_relative 'lib/sqlite_manager'
+require_relative 'lib/record_manager'
 require_relative 'lib/pg_manager'
 
 def init
@@ -11,7 +11,7 @@ def init
       NYPLRubyUtil::KmsClient.new({ profile: ENV['PROFILE'] }) :
       NYPLRubyUtil::KmsClient.new
 
-    $sqlite_client = SQLITEClient.new
+    $record_manager = RecordManager.new
     $pg_client = PSQLClient.new
 
     $logger.debug 'Initialized function'
@@ -41,9 +41,9 @@ end
 # rubocop:enable Lint/UnusedMethodArgument
 
 def fetch_records_and_respond(params)
-    records = $sqlite_client.fetch_records params['holding_id']
-rescue SqliteError
-    $logger.info 'Received sqlite3 error'
+    records = $record_manager.fetch_records params['holding_id']
+rescue PSQLError
+    $logger.info 'Received pg error'
     create_response(500, 'Failed to execute sql query')
 else
     create_response(200, records)

@@ -27,22 +27,15 @@ class RowTransformer
     }
 
     def initialize(row)
-        @db_row = row
-        @transformed_row = nil
+        @transformed_row = row
         @formatted_row = BoxRow.new
     end
 
     def transform
-        transform_row
-
         load_simple_fields # Loads fields that don't require transformation into BoxRow
         load_status_field # Provides translation of single character status code
         load_enumeration_field # Parses enumeration fields, returning array and joined string for display
         load_date_fields # Transforms chronology fields into ISO-8601 start and end dates
-    end
-
-    def transform_row
-        @transformed_row = @db_row
     end
 
     def load_simple_fields

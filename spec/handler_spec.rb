@@ -6,8 +6,8 @@ describe 'handler' do
         before(:each) do
             @kms_mock = mock
             NYPLRubyUtil::KmsClient.stubs(:new).returns(@kms_mock)
-            @sqlite_mock = mock
-            SQLITEClient.stubs(:new).returns(@sqlite_mock)
+            @record_manager_mock = mock
+            RecordManager.stubs(:new).returns(@record_manager_mock)
             @pg_mock = mock
             PSQLClient.stubs(:new).returns(@pg_mock)
         end
@@ -21,7 +21,7 @@ describe 'handler' do
             init
 
             expect($kms_client).to eq(@kms_mock)
-            expect($sqlite_client).to eq(@sqlite_mock)
+            expect($record_manager).to eq(@record_manager_mock)
             expect($initialized).to eq(true)
         end
     end
@@ -84,11 +84,11 @@ describe 'handler' do
 
     describe :fetch_records_and_response do
         before(:each) do
-            $sqlite_client = mock
+            $record_manager = mock
         end
 
         it 'should return 200 status on successful retrieval of records' do
-            $sqlite_client.stubs(:fetch_records).once.with(1).returns('test_records')
+            $record_manager.stubs(:fetch_records).once.with(1).returns('test_records')
             stubs(:create_response).once.with(200, 'test_records').returns(200)
 
             resp = fetch_records_and_respond({ 'holding_id' => 1 })
@@ -97,7 +97,7 @@ describe 'handler' do
         end
 
         it 'should return 500 status if record retrieval fails' do
-            $sqlite_client.stubs(:fetch_records).once.with(1).raises(SqliteError.new('test_error'))
+            $record_manager.stubs(:fetch_records).once.with(1).raises(PSQLError.new('test_error'))
             stubs(:create_response).once.with(500, 'Failed to execute sql query').returns(500)
 
             resp = fetch_records_and_respond({ 'holding_id' => 1 })

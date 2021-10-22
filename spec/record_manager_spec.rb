@@ -1,9 +1,9 @@
-require_relative '../lib/sqlite_manager'
+require_relative '../lib/record_manager'
 require_relative './spec_helper'
 
-describe SQLITEClient do
+describe RecordManager do
     before(:each) do
-        @test_client = SQLITEClient.new
+        @test_client = RecordManager.new
     end
 
     describe :fetch_records do
@@ -15,8 +15,6 @@ describe SQLITEClient do
             @mock_resp_two.stubs(:ntuples).returns(0)
             $pg_client.stubs(:exec_query).once.with(ENV['DB_QUERY'], 1, { offset: 0, limit: 100_000 })
                 .returns(@mock_resp_one)
-            $pg_client.stubs(:exec_query).once.with(ENV['DB_QUERY'], 1, { offset: 100_000, limit: 100_000 })
-                .returns(@mock_resp_two)
             @test_client.stubs(:parse_rows).once.with([{ 'id' => 1, 'record_num' => 2, 'box_count' => 3 }])
 
             @test_client.fetch_records 1

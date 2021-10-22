@@ -15,8 +15,6 @@
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 ENV['LOG_LEVEL'] = 'error'
 ENV['AWS_REGION'] = 'test'
-ENV['SQLITE_FILE'] = 'testdb.sql'
-ENV['SQLITE_BUCKET'] = 'test_bucket'
 ENV['DB_HOST'] = 'test_host'
 ENV['DB_PORT'] = '9999'
 ENV['DB_NAME'] = 'test_db'

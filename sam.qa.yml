@@ -17,8 +17,3 @@ Globals:
 Resources:
   SierraCheckInCardPoller-qa:
     Type: AWS::Serverless::Function
-    Properties:
-      Environment:
-        Variables:
-            SQLITE_FILE: 'checkInCards.sql'
-            SQLITE_BUCKET: 'check-in-card-data-qa'

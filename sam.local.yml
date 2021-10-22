@@ -20,8 +20,6 @@ Resources:
     Properties:
       Environment:
         Variables:
-            SQLITE_FILE: 'checkInCards.sql'
-            SQLITE_BUCKET: 'check-in-card-data'
             DB_HOST: 10.146.200.10
             DB_PORT: '1032'
             DB_PSWD: AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAGwwagYJKoZIhvcNAQcGoF0wWwIBADBWBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDDnjoRlSmwePv1QxSwIBEIAplnBJKYjr0qYPnQ3GIZ3yDzbf3i0Aa5q+dLB07MRFxbF6Rok1MKeCwZ8=
