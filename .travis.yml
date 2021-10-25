@@ -26,6 +26,12 @@ deploy:
   handler_name: handle_event
   layers:
   - arn:aws:lambda:us-east-1:946183545209:layer:ruby-pg-sqlite-lambda:2
+  vpc_config:
+    subnet_ids:
+    - subnet-21a3b244
+    - subnet-f35de0a9
+    security_group_ids:
+    - sg-aa74f1db
   environment:
     variables:
       LOG_LEVEL: debug
