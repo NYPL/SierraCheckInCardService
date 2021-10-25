@@ -5,14 +5,6 @@ require_relative './enumeration_component'
 class RowTransformer
     attr_reader :formatted_row
 
-    @@box_columns = [
-        'id', 'holding_record_id', 'record_num', 'holding_record_cardlink_id', 'box_count', 'enum_level_a',
-        'enum_level_b', 'enum_level_c', 'enum_level_d', 'enum_level_e', 'enum_level_f', 'enum_level_g', 'enum_level_h',
-        'chron_level_i', 'chron_level_j', 'chron_level_k', 'chron_level_l', 'chron_level_m', 'chron_level_i_trans_date',
-        'chron_level_j_trans_date', 'chron_level_k_trans_date', 'chron_level_l_trans_date', 'chron_level_m_trans_date',
-        'note', 'box_status_code', 'claim_cnt', 'copies_cnt', 'url', 'is_suppressed', 'staff_note'
-    ]
-
     @@box_codes = {
         'A' => 'Arrived',
         'B' => 'Bound',
@@ -35,22 +27,15 @@ class RowTransformer
     }
 
     def initialize(row)
-        @db_row = row
-        @transformed_row = nil
+        @transformed_row = row
         @formatted_row = BoxRow.new
     end
 
     def transform
-        transform_row
-
         load_simple_fields # Loads fields that don't require transformation into BoxRow
         load_status_field # Provides translation of single character status code
         load_enumeration_field # Parses enumeration fields, returning array and joined string for display
         load_date_fields # Transforms chronology fields into ISO-8601 start and end dates
-    end
-
-    def transform_row
-        @transformed_row = @@box_columns.zip(@db_row).to_h
     end
 
     def load_simple_fields
