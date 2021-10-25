@@ -24,7 +24,7 @@ end
 
 desc 'Update lambda layers, environment_variables, vpc, and events'
 task :set_config do
-    rake_helper = NyplRubyUtil::DeployHelper.new
+    rake_helper = NYPLRubyUtil::DeployHelper.new
     rake_helper.update_lambda_configuration
     rake_helper.update_event
 end
