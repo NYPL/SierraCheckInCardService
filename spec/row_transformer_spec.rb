@@ -8,43 +8,19 @@ describe RowTransformer do
 
     describe :initialize do
         it 'should initialize with row data' do
-            expect(@test_row.instance_variable_get(:@db_row)).to eq('test_row')
-            expect(@test_row.instance_variable_get(:@transformed_row)).to eq(nil)
+            expect(@test_row.instance_variable_get(:@transformed_row)).to eq('test_row')
             expect(@test_row.instance_variable_get(:@formatted_row).class).to eq(BoxRow)
         end
     end
 
     describe :transform do
         it 'should invoke all transformation methods' do
-            @test_row.stubs(:transform_row).once
             @test_row.stubs(:load_simple_fields).once
             @test_row.stubs(:load_status_field).once
             @test_row.stubs(:load_enumeration_field).once
             @test_row.stubs(:load_date_fields).once
 
             @test_row.transform
-        end
-    end
-
-    describe :transform_row do
-        it 'should turn arrays of field keys and values into a hash' do
-            test_val = Array.new(30)
-            test_val[0] = 1
-            test_val[1] = 2
-            test_val[2] = 3
-            test_val[4] = 120
-            test_val[5] = 15
-            test_val[29] = 'testing'
-            @test_row.instance_variable_set(:@db_row, test_val)
-
-            @test_row.transform_row
-
-            expect(@test_row.instance_variable_get(:@transformed_row)['id']).to eq(1)
-            expect(@test_row.instance_variable_get(:@transformed_row)['holding_record_id']).to eq(2)
-            expect(@test_row.instance_variable_get(:@transformed_row)['record_num']).to eq(3)
-            expect(@test_row.instance_variable_get(:@transformed_row)['box_count']).to eq(120)
-            expect(@test_row.instance_variable_get(:@transformed_row)['enum_level_a']).to eq(15)
-            expect(@test_row.instance_variable_get(:@transformed_row)['staff_note']).to eq('testing')
         end
     end
 

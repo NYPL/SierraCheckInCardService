@@ -15,8 +15,20 @@
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 ENV['LOG_LEVEL'] = 'error'
 ENV['AWS_REGION'] = 'test'
-ENV['SQLITE_FILE'] = 'testdb.sql'
-ENV['SQLITE_BUCKET'] = 'test_bucket'
+ENV['DB_HOST'] = 'test_host'
+ENV['DB_PORT'] = '9999'
+ENV['DB_NAME'] = 'test_db'
+ENV['DB_USER'] = 'test_usr'
+ENV['DB_PSWD'] = 'test_pswd'
+ENV['DB_QUERY'] = 'SELECT sierra_view.holding_record_card.id, sierra_view.holding_record_card.holding_record_id,
+sierra_view.holding_view.record_num, sierra_view.holding_record_box.* FROM sierra_view.holding_record_card
+LEFT OUTER JOIN sierra_view.holding_view
+ON sierra_view.holding_view.id=sierra_view.holding_record_card.holding_record_id
+LEFT OUTER JOIN sierra_view.holding_record_cardlink
+ON sierra_view.holding_record_card.id=sierra_view.holding_record_cardlink.holding_record_card_id
+LEFT OUTER JOIN sierra_view.holding_record_box
+ON sierra_view.holding_record_box.holding_record_cardlink_id=sierra_view.holding_record_cardlink.id
+WHERE sierra_view.holding_view.record_num = $1'
 
 RSpec.configure do |config|
     # rspec-expectations config goes here. You can use an alternate
