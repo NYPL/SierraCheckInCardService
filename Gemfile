@@ -9,7 +9,7 @@ end
 
 group :test do
     gem 'mocha'
+    gem 'pg'
     gem 'rspec'
     gem 'rubocop', require: false
-    gem 'pg'
 end
