@@ -7,9 +7,10 @@ def init
     return if $initialized
 
     $logger = NYPLRubyUtil::NyplLogFormatter.new($stdout, level: ENV['LOG_LEVEL'])
-    $kms_client = ENV['PROFILE'] ?
-      NYPLRubyUtil::KmsClient.new({ profile: ENV['PROFILE'] }) :
-      NYPLRubyUtil::KmsClient.new
+    $kms_client = ENV['APP_ENV'] == 'local' ?
+      NYPLRubyUtil::KmsClient.new({
+          access_key_id: ENV['AWS_ACCESS_KEY_ID'], secret_access_key: ENV['AWS_SECRET_ACCESS_KEY']
+      }) : NYPLRubyUtil::KmsClient.new
 
     $record_manager = RecordManager.new
     $pg_client = PSQLClient.new

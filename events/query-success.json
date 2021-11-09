@@ -1,6 +1,6 @@
 {
-    "resource":"/api/v0.1/checkincards",
-    "path":"/api/v0.1/checkincards",
+    "resource":"/api/v0.1/holdings/check-in-cards",
+    "path":"/api/v0.1/holdings/check-in-cards",
     "httpMethod":"GET",
     "isBase64Encoded": false,
     "queryStringParameters": {
