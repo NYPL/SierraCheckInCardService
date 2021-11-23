@@ -39,9 +39,9 @@ class RowTransformer
     end
 
     def load_simple_fields
-        @formatted_row.box_id = @transformed_row['id']
-        @formatted_row.holding_id = @transformed_row['record_num']
-        @formatted_row.box_count = @transformed_row['box_count']
+        @formatted_row.box_id = @transformed_row['id'].to_i
+        @formatted_row.holding_id = @transformed_row['record_num'].to_i
+        @formatted_row.box_count = @transformed_row['box_count'].to_i
         @formatted_row.claim_count = @transformed_row['claim_cnt']
         @formatted_row.copy_count = @transformed_row['copy_cnt']
         @formatted_row.url = @transformed_row['url']
