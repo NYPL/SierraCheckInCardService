@@ -38,8 +38,8 @@ class RowTransformer
         load_date_fields # Transforms chronology fields into ISO-8601 start and end dates
     end
 
-    def optional_string_to_i (str)
-      str ? str.to_i : str
+    def optional_string_to_i(str)
+        str ? str.to_i : str
     end
 
     def load_simple_fields
