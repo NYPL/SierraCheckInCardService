@@ -38,12 +38,16 @@ class RowTransformer
         load_date_fields # Transforms chronology fields into ISO-8601 start and end dates
     end
 
+    def optional_string_to_i(str)
+        str ? str.to_i : str
+    end
+
     def load_simple_fields
-        @formatted_row.box_id = @transformed_row['id']
-        @formatted_row.holding_id = @transformed_row['record_num']
-        @formatted_row.box_count = @transformed_row['box_count']
-        @formatted_row.claim_count = @transformed_row['claim_cnt']
-        @formatted_row.copy_count = @transformed_row['copy_cnt']
+        @formatted_row.box_id = @transformed_row['id'].to_i
+        @formatted_row.holding_id = @transformed_row['record_num'].to_i
+        @formatted_row.box_count = @transformed_row['box_count'].to_i
+        @formatted_row.claim_count = optional_string_to_i(@transformed_row['claim_cnt'])
+        @formatted_row.copy_count = optional_string_to_i(@transformed_row['copy_cnt'])
         @formatted_row.url = @transformed_row['url']
         @formatted_row.suppressed = @transformed_row['is_suppressed']
         @formatted_row.note = @transformed_row['note']
