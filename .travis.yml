@@ -89,6 +89,8 @@ deploy:
   secret_access_key: "$AWS_SECRET_ACCESS_KEY_PRODUCTION"
   on:
     branch: main
+addons:
+  postgresql: "11"
 after_deploy:
 - rake set_config
 env:
