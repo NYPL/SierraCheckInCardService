@@ -1,6 +1,5 @@
 source 'https://rubygems.org'
 
-gem 'aws-sdk-s3'
 gem 'nypl_ruby_util'
 
 group :deployment do
@@ -10,7 +9,7 @@ end
 
 group :test do
     gem 'mocha'
+    gem 'pg'
     gem 'rspec'
     gem 'rubocop', require: false
-    gem 'sqlite3'
 end

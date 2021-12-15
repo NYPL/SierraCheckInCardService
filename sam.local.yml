@@ -8,11 +8,12 @@ Globals:
       Runtime: ruby2.7
       Handler: app.handle_event
       Layers:
-        - arn:aws:lambda:us-east-1:224280085904:layer:ruby-pg-sqlite-lambda:2
+        - arn:aws:lambda:us-east-1:946183545209:layer:ruby-pg-sqlite-lambda:2
       Environment:
         Variables:
           LOG_LEVEL: debug
           AWS_REGION: us-east-1
+          APP_ENV: local
 
 Resources:
   SierraCheckInCardPoller:
@@ -20,5 +21,14 @@ Resources:
     Properties:
       Environment:
         Variables:
-            SQLITE_FILE: 'checkInCards.sql'
-            SQLITE_BUCKET: 'check-in-card-data'
+            DB_HOST: 10.146.200.10
+            DB_PORT: '1032'
+            DB_PSWD: AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAGwwagYJKoZIhvcNAQcGoF0wWwIBADBWBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDDnjoRlSmwePv1QxSwIBEIAplnBJKYjr0qYPnQ3GIZ3yDzbf3i0Aa5q+dLB07MRFxbF6Rok1MKeCwZ8=
+            DB_USER: AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAGcwZQYJKoZIhvcNAQcGoFgwVgIBADBRBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDNapmZKmWxO59lrUhAIBEIAkPcsXj35Is8+naFzWIsWYMa9Yvt+aJZqfFZgDicQSnmEUAWBr
+            DB_NAME: iii
+            DB_QUERY: 'SELECT sierra_view.holding_record_card.id, sierra_view.holding_record_card.holding_record_id,
+            sierra_view.holding_view.record_num, sierra_view.holding_record_box.* FROM sierra_view.holding_record_card
+            LEFT OUTER JOIN sierra_view.holding_view ON sierra_view.holding_view.id=sierra_view.holding_record_card.holding_record_id
+            LEFT OUTER JOIN sierra_view.holding_record_cardlink ON sierra_view.holding_record_card.id=sierra_view.holding_record_cardlink.holding_record_card_id
+            LEFT OUTER JOIN sierra_view.holding_record_box ON sierra_view.holding_record_box.holding_record_cardlink_id=sierra_view.holding_record_cardlink.id
+            WHERE sierra_view.holding_view.record_num = $1'

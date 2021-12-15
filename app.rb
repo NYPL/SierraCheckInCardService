@@ -1,23 +1,19 @@
 require 'nypl_ruby_util'
 
-require_relative 'lib/s3_manager'
-require_relative 'lib/sqlite_manager'
+require_relative 'lib/record_manager'
+require_relative 'lib/pg_manager'
 
 def init
     return if $initialized
 
     $logger = NYPLRubyUtil::NyplLogFormatter.new($stdout, level: ENV['LOG_LEVEL'])
-    $kms_client = NYPLRubyUtil::KmsClient.new
-    $s3_client = S3Client.new
+    $kms_client = ENV['APP_ENV'] == 'local' ?
+      NYPLRubyUtil::KmsClient.new({
+          access_key_id: ENV['AWS_ACCESS_KEY_ID'], secret_access_key: ENV['AWS_SECRET_ACCESS_KEY']
+      }) : NYPLRubyUtil::KmsClient.new
 
-    begin
-        $s3_client.retrieve_data ENV['SQLITE_FILE']
-    rescue S3Error => e
-        $logger.info 'Received s3 error, unable to load sqlite file from s3', { message: e.message }
-        return create_response(500, 'unable to load necessary data from AWS S3')
-    end
-
-    $sqlite_client = SQLITEClient.new
+    $record_manager = RecordManager.new
+    $pg_client = PSQLClient.new
 
     $logger.debug 'Initialized function'
     $initialized = true
@@ -46,9 +42,9 @@ end
 # rubocop:enable Lint/UnusedMethodArgument
 
 def fetch_records_and_respond(params)
-    records = $sqlite_client.fetch_records params['holding_id']
-rescue SqliteError
-    $logger.info 'Received sqlite3 error'
+    records = $record_manager.fetch_records params['holding_id']
+rescue PSQLError
+    $logger.info 'Received pg error'
     create_response(500, 'Failed to execute sql query')
 else
     create_response(200, records)

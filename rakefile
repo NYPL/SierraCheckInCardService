@@ -9,7 +9,9 @@ end
 
 desc 'Run function locally. Accepts the name of the resource from the SAM config to select which function to invoke'
 task :run_local, [:event_source] do |_, args|
-    sh %( sam local invoke -t sam.local.yml --event #{args[:event_source]} --profile nypl-sandbox --region us-east-1 )
+    sh %(
+        sam local invoke -t sam.local.yml --event #{args[:event_source]} --profile nypl-digital-dev --region us-east-1
+    )
 end
 
 desc 'Run bundler for local development and deployment'
@@ -24,7 +26,7 @@ end
 
 desc 'Update lambda layers, environment_variables, vpc, and events'
 task :set_config do
-    rake_helper = NyplRubyUtil::DeployHelper.new
+    rake_helper = NYPLRubyUtil::DeployHelper.new
     rake_helper.update_lambda_configuration
     rake_helper.update_event
 end
