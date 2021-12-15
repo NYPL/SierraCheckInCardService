@@ -2,97 +2,46 @@ language: ruby
 rvm:
 - 2.7
 before_install:
+- wget https://releases.hashicorp.com/terraform/"$TF_VERSION"/terraform_"$TF_VERSION"_linux_amd64.zip
+- unzip terraform_"$TF_VERSION"_linux_amd64.zip
+- sudo mv terraform /usr/local/bin/
+- rm terraform_"$TF_VERSION"_linux_amd64.zip
 - gem update --system
 - gem install bundler
 - gem install nypl_ruby_util
 install:
 - rake run_bundler
-script:
-- rake lint
-- rake test
 before_deploy:
 - rm -rf vendor
 - bundle install --without test
-deploy:
-- provider: lambda
-  function_name: SierraCheckInCardService-qa
-  description: API service for returning check-in cards/boxes for associated holdings
-  region: us-east-1
-  role: arn:aws:iam::946183545209:role/lambda-full-access
-  runtime: ruby2.7
-  timeout: 15
-  memory_size: 512
-  module_name: app
-  handler_name: handle_event
-  layers:
-  - arn:aws:lambda:us-east-1:946183545209:layer:ruby-pg-sqlite-lambda:2
-  vpc_config:
-    subnet_ids:
-    - subnet-21a3b244
-    - subnet-f35de0a9
-    security_group_ids:
-    - sg-aa74f1db
-  environment:
-    variables:
-      LOG_LEVEL: debug
-      DB_HOST: 10.146.200.10
-      DB_PORT: '1032'
-      DB_PSWD: AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAGwwagYJKoZIhvcNAQcGoF0wWwIBADBWBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDDnjoRlSmwePv1QxSwIBEIAplnBJKYjr0qYPnQ3GIZ3yDzbf3i0Aa5q+dLB07MRFxbF6Rok1MKeCwZ8=
-      DB_USER: AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAGcwZQYJKoZIhvcNAQcGoFgwVgIBADBRBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDNapmZKmWxO59lrUhAIBEIAkPcsXj35Is8+naFzWIsWYMa9Yvt+aJZqfFZgDicQSnmEUAWBr
-      DB_NAME: iii
-      DB_QUERY: 'SELECT sierra_view.holding_record_card.id, sierra_view.holding_record_card.holding_record_id,
-      sierra_view.holding_view.record_num, sierra_view.holding_record_box.* FROM sierra_view.holding_record_card
-      LEFT OUTER JOIN sierra_view.holding_view ON sierra_view.holding_view.id=sierra_view.holding_record_card.holding_record_id
-      LEFT OUTER JOIN sierra_view.holding_record_cardlink ON sierra_view.holding_record_card.id=sierra_view.holding_record_cardlink.holding_record_card_id
-      LEFT OUTER JOIN sierra_view.holding_record_box ON sierra_view.holding_record_box.holding_record_cardlink_id=sierra_view.holding_record_cardlink.id
-      WHERE sierra_view.holding_view.record_num = $1'
-  skip_cleanup: true
-  access_key_id: "$AWS_ACCESS_KEY_ID_QA"
-  secret_access_key: "$AWS_SECRET_ACCESS_KEY_QA"
-  on:
-    branch: qa
-- provider: lambda
-  function_name: SierraCheckInCardService-production
-  description: API service for returning check-in cards/boxes for associated holdings
-  region: us-east-1
-  role: arn:aws:iam::946183545209:role/lambda-full-access
-  runtime: ruby2.7
-  timeout: 15
-  memory_size: 512
-  module_name: app
-  handler_name: handle_event
-  layers:
-  - arn:aws:lambda:us-east-1:946183545209:layer:ruby-pg-sqlite-lambda:2
-  vpc_config:
-    subnet_ids:
-    - subnet-59bcdd03
-    - subnet-5deecd15
-    security_group_ids:
-    - sg-116eeb60
-  environment:
-    variables:
-      LOG_LEVEL: debug
-      LOG_LEVEL: info
-      DB_HOST: 10.146.200.8
-      DB_PORT: '1032'
-      DB_PSWD: AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAG4wbAYJKoZIhvcNAQcGoF8wXQIBADBYBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDPIaMdJ70N4arvdlfgIBEIAr2OTX22QsmU1LpexxEDrfxjtnFqcm4pCnfDoP/z80c8iW2DEtvIOrsY7o0A==
-      DB_USER: AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAGcwZQYJKoZIhvcNAQcGoFgwVgIBADBRBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDNapmZKmWxO59lrUhAIBEIAkPcsXj35Is8+naFzWIsWYMa9Yvt+aJZqfFZgDicQSnmEUAWBr
-      DB_NAME: iii
-      DB_QUERY: 'SELECT sierra_view.holding_record_card.id, sierra_view.holding_record_card.holding_record_id,
-      sierra_view.holding_view.record_num, sierra_view.holding_record_box.* FROM sierra_view.holding_record_card
-      LEFT OUTER JOIN sierra_view.holding_view ON sierra_view.holding_view.id=sierra_view.holding_record_card.holding_record_id
-      LEFT OUTER JOIN sierra_view.holding_record_cardlink ON sierra_view.holding_record_card.id=sierra_view.holding_record_cardlink.holding_record_card_id
-      LEFT OUTER JOIN sierra_view.holding_record_box ON sierra_view.holding_record_box.holding_record_cardlink_id=sierra_view.holding_record_cardlink.id
-      WHERE sierra_view.hold_view.record_num = $1'
-  skip_cleanup: true
-  access_key_id: "$AWS_ACCESS_KEY_ID_PRODUCTION"
-  secret_access_key: "$AWS_SECRET_ACCESS_KEY_PRODUCTION"
-  on:
-    branch: main
-after_deploy:
-- rake set_config
+jobs:
+  include:
+    - stage: test
+      script:
+        - rake lint
+        - rake test
+    - stage: deploy qa
+      if: type IN (push) and branch = qa
+      env:
+        - AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID_QA
+        - AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY_QA
+      script:
+        - terraform -chdir=provisioning/qa init -input=false
+        - echo "Deploying to qa"
+        - terraform -chdir=provisioning/qa apply -auto-approve -input=false
+    - stage: deploy production
+      if: type IN (push) and branch = main
+      env:
+        - AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID_PRODUCTION
+        - AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY_PRODUCTION
+      script:
+        - terraform -chdir=provisioning/production init -input=false
+        - echo "Deploying to production"
+        - terraform -chdir=provisioning/production apply -auto-approve -input=false
+
 env:
   global:
   - secure: mvkAvo1cMLYQ8cFc/Jm7EBYOQ2kXGJnc/8D9PmHsQuktZcvzGSZe8yM9RCkzakyXQyf8XYmlT73/SwLx/l8g4X0Bg+9YfNSxkyl0mMfPXCbfe86/LQim+ZEiCaXn40PVtv+rOqeh9Ux2YJgLRRrE3mp7sTEcqKEp3mMlgMExSr0Wurlxwp5enEy2e9beO4n2QLzDsVL1yTEavdYgko/9eelc0jd+ShH2O9XUra/Uhkq3QoOWHTrp44AUzH8YTo637Ta75h4QNmMjoMqZH3bw6I+nUR8yTy8gOJEI2wKg2Uv9HriPYeW77WZQhLN0v/4Yo/r8LOjwbCWTCxs1WDMF/sfIPMSv+/gIYTk3/jkLrg7+ikgBfzYleoKF4dyax7fNgRA9Kure3hTXnnVBaeSqLu8x8v9eDRj9Q2VLb2maia0Fooa3zwOfbH9m3setKqRt7ksurzyQ3F7UXKRq6VmHrDQnLiDRzdjxjjq0ML2eDR4k9WQt9cl+EaCMEUtWelQtOjYIcSAFIUI3A6LMqop3om0e/ibl5YNdr3m4uibF9CQjBQb+BzkUZsrJA65ZtGlPIcIQSgI2J3dJWl+h4vhVSX8pvEqt0KkRSlw3J4wYtxbxMgt9Amx8uAFfwuMlvZBS3Jf7VQNh2MLqR8PdbEgzJVxUKG3T3CnW4ltrCuxwnCw=
   - secure: jYBtN1M3AATumSeq+FKbAsYetV2RclyK/itSUc9oMpgpJwnyWcxi+kPZhlbyqQjdHWTBPL6xVnxPtBDR6w2Rf0JwCBBBpNnJpBoEaTrgBWKU2BwjEc0Og+yxoXyOVKsG7R3uuQHjKZuHcnTTYYctzroPpTng5JxHLZ+nOw52UY8RK3Xv/539MNh+UxiEk8mn6af2fdhOeD0EFWA4BrfOh99YXdPdZBVq/jOkDnvIGS8leHR7AbB126gKoWyVG51Q/vZ8eX0oojGGxMw200kdljzEUCKIB0b2djVHhVjy0a4Plh34wfE/dokJ3C96u/CQnn22LxDC8wJl5aTjGQpY+hcNMomW7YzcwSN1+QPg1MszLMXGtfcJ3s6jDcIoyZunosY+TYZo5Wp8vLjNJharI0Wlt+y33A8uiMuG785VAjsHS8M8pKeyQIUrCkuSYjUpyR1D9iumtJwYgrAbA997paoPUO9l0f1wBBnexWmyFbZhVkQR2bA5gaL5AnuevhLEP21s3q6yNUYrmSrMW+q7/x5xtAr7jc446I/dxoCqZ6K//XNGQKdWRFEwu7Vb++hr3TlW2bUoOGk8qzKCpv20JguGHNAfNzpnWjCq/PHJnWshwGFG8FdxVEtztiow5taZN2GFvouXtGfyqWCJXk7uP/Gd8BE1hH5s//51Wr6sMps=
   - secure: YGm0GNfhRuOJuE1g7SxMQeqGYtWmf5gJCdtneNKBWkX+HRD4ViY9IuJy45t1guOYPromDO520EDi34dRF0u/PEjmP15UaDBjpqM1hO4H93C2yIpV6lpUeiGHRYHPTlVSs+iCaijGGpsyUGYgZH0ebXWGPTMHY4Oayf7MujOmWqJC8ydql7WEIyPS7QBnDTOWnjwvmqDrVNHwB/TyzOn+ktK4gIaA/PIxdt59jXQ61NzyfrZg9sF0ParXKWyykBNqrwgTbngQPRr3vx1PT8ZVfXfFXbb9Oo1gpQhqqNrNUIFY+V6JiONtIx6JCuxGcUs6/fmwual9/8F6zws5O7o9zP+WptGNacN3iVafbjjeQ8BbwSq1XBR7vPp2mRhuu+7q/Ak96ovx0OvFhK8er/xyJvtcwfUWiGmRC0pJSJnqIqgzXPyKNqEmzy+RYQxMo7MwTfvPrcLmFLOm5tFxMRQkZWfD8Oi/EHr7auafT1V5Gc0qwmXpK1flSqTCI6cyJVeH7ig7qBPMvEGrmTO9sVi8klFE+r/yxaMwBa4CtEhdhWwlDYch753TGPb8dv1o8PPixwzzZUjKg8dFObyoVzkwgAcb3LSFvZ7CJzqpVVU2K1oMvJhJ6h3ls1uKDhEchADuysT8U9j14xDdFFKlEJfrPX1a0lQCxreEE1HWhsoX5d0=
+  - TF_VERSION=1.0.11
