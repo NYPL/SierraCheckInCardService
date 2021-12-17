@@ -4,6 +4,15 @@ require_relative './spec_helper'
 describe RecordManager do
     before(:each) do
         @test_client = RecordManager.new
+        @db_query = <<~SQL
+        SELECT sierra_view.holding_record_card.id, sierra_view.holding_record_card.holding_record_id,
+        sierra_view.holding_view.record_num, sierra_view.holding_record_box.*
+        FROM sierra_view.holding_record_card
+        LEFT OUTER JOIN sierra_view.holding_view ON sierra_view.holding_view.id=sierra_view.holding_record_card.holding_record_id
+        LEFT OUTER JOIN sierra_view.holding_record_cardlink ON sierra_view.holding_record_card.id=sierra_view.holding_record_cardlink.holding_record_card_id
+        LEFT OUTER JOIN sierra_view.holding_record_box ON sierra_view.holding_record_box.holding_record_cardlink_id=sierra_view.holding_record_cardlink.id
+        WHERE sierra_view.holding_view.record_num = $1
+        SQL
     end
 
     describe :fetch_records do
@@ -13,7 +22,7 @@ describe RecordManager do
             @mock_resp_one.stubs(:to_a).returns([{ 'id' => 1, 'record_num' => 2, 'box_count' => 3 }])
             @mock_resp_two = mock
             @mock_resp_two.stubs(:ntuples).returns(0)
-            $pg_client.stubs(:exec_query).once.with(ENV['DB_QUERY'], 1, { offset: 0, limit: 100_000 })
+            $pg_client.stubs(:exec_query).once.with(@db_query, 1, { offset: 0, limit: 100_000 })
                 .returns(@mock_resp_one)
             @test_client.stubs(:parse_rows).once.with([{ 'id' => 1, 'record_num' => 2, 'box_count' => 3 }])
 
