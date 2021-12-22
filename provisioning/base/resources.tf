@@ -8,7 +8,7 @@ variable "environment" {
   description = "The name of the environment (qa, production). This controls the name of the lambda and the env vars loaded."
 
   validation {
-    condition = contains(["qa, "production"], var.environment)
+    condition = contains(["qa", "production"], var.environment)
     error_message = "The environment must be 'qa' or 'production'."
   }
 }
