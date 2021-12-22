@@ -67,6 +67,12 @@ To run the function locally it may be invoked with rake, where FUNCTION is the n
 
 `rake run_local`
 
+## Contributing
+
+1. Cut PRs from `development` and merge into `development`
+2. Merge `development` into `qa`
+3. Merge `qa` into `main`
+
 ## Testing
 
 Testing is provided via `rspec` with `mocha` for stubbing/mocking. The test suite can be invoked with `rake test`
