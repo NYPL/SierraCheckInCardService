@@ -11,9 +11,6 @@ before_install:
 - gem install nypl_ruby_util
 install:
 - rake run_bundler
-before_deploy:
-- rm -rf vendor
-- bundle install --without test
 jobs:
   include:
     - stage: test
@@ -26,6 +23,8 @@ jobs:
         - AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID_QA
         - AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY_QA
       script:
+        - rm -rf vendor
+        - bundle install --without test
         - terraform -chdir=provisioning/qa init -input=false
         - echo "Deploying to qa"
         - terraform -chdir=provisioning/qa apply -auto-approve -input=false
@@ -35,6 +34,8 @@ jobs:
         - AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID_PRODUCTION
         - AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY_PRODUCTION
       script:
+        - rm -rf vendor
+        - bundle install --without test
         - terraform -chdir=provisioning/production init -input=false
         - echo "Deploying to production"
         - terraform -chdir=provisioning/production apply -auto-approve -input=false
