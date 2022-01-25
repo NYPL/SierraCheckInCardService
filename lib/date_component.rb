@@ -45,7 +45,7 @@ class DateComponent
             @date_strs[:start] = start_str
             @date_strs[:end] = end_str && end_str != start_str ? end_str : nil
         rescue Date::Error, TypeError, DateComponentError
-            $logger.error 'Unable to parse date values for this check-in box'
+            $logger.warn 'Unable to parse date values for this check-in box'
             $logger.debug date_components
         end
     end
@@ -88,7 +88,7 @@ class DateComponent
             begin
                 date_str = DateTime.new(*date_array.compact).strftime('%b. %Y')
             rescue Date::Error => e
-                $logger.error 'Unable to parse date', { value: date_array, reason: e }
+                $logger.warn 'Unable to parse date', { value: date_array, reason: e }
                 # DateTime doesn't know about seasons, so fake it here
                 date_str = "#{@@season_codes[date_array[1]]} #{date_array[0]}"
             end
@@ -99,7 +99,7 @@ class DateComponent
         when [1, 0, 1]
             date_str = "Day #{date_array[2]} of #{date_array[0]}"
         else
-            $logger.error 'Unable to process date components, unrecognized format', { components: part }
+            $logger.warn 'Unable to process date components, unrecognized format', { components: part }
             $logger.debug 'Shape of components: ', { date_comp_shape: null_positions }
             raise DateComponentError, 'Unprocessable component found'
         end
